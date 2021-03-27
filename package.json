@@ -1,0 +1,22 @@
+{
+  "name": "discordBot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./src/bot.js",
+    "dev": "nodemon ./src/bot.js",
+    "prod": "node ./src/bot.js >> request.log 2>> error.log &",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "discord.js": "^12.5.1",
+    "dotenv": "^8.2.0",
+    "fuzzball": "^1.3.1",
+    "passport-bnet": "^2.0.0"
+  }
+}
