@@ -7,7 +7,7 @@ async function fetchItems(item, urlBuilder){
     let data = {};
     let pageCount = response.data.pageCount;
     let results = response.data.results;
-    if(pageCount > 1){
+    if(pageCount >= 1){
         results.forEach(element =>{
             data[element.data.name.en_GB] = element.data.media.id
         })
