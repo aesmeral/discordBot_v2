@@ -44,8 +44,9 @@ function deleteMessage(message){
         TODO: NOTES --- Need to implement these functions (Need to make python scripts to get data because it would take forever if we kept rerunning jobs to search..)
 
         itemPrice {server} {string/id}          <- gets auction house price from your server                         (built in)
-        item  {item string}                     <- provides a link (multiple if applicable) to your item             (Blizzard API)     
-
+        item  {item string}                     <- provides a link (multiple if applicable) to your item             (Blizzard API)     -- completed
+        class {spec} {class}                    <- get a specific wowhead guide                                      (built-in)         
+        class {class/spec}                      <- if given a class, provide multiple spec. if given a spec ^^       (built-in)
         help                                    <- display all the commands                                          (built in)         -- completed
     */
 
@@ -161,8 +162,8 @@ client.on('message', async (message) => {
                     } else {
                         botResponses = "```No item could be found```"
                     }
-                    break;
                 }
+                break;
             default:
                 botResponses = ResponseType.ERR.RESPONSE;
         }
