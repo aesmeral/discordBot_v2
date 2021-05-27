@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./src/bot.js",
-    "dev": "nodemon ./src/bot.js",
+    "dev": "nodemon ./src/bot.js --development" ,
     "prod": "node ./src/bot.js >> request.log 2>> error.log &",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

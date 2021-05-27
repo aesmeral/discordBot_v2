@@ -193,3 +193,4 @@ Passport(process.env.BnetID, process.env.BnetSecret)
     });
 
 client.login(_discordToken);
+console.log(process.argv);
