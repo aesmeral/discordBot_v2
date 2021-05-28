@@ -6,11 +6,14 @@ const { ResponseType } = require('./util/cmdType');
 const { GetRaider, GetAffix } = require('./rioAPI/requestData');
 const { FetchItems } = require('./built-in/fetchItems');
 const { RequestedItems } = require('./built-in/getItem');
+const { GenerateRealms } = require('./wowAPI/gameData');
 
 const client = new Client();
 const PREFIX = "!"
 const _discordToken = process.env.DISCORD_TOKEN;
+const minutes = parseInt(process.env.IntervalTime);
 var token;
+var mappedRealms;
 
 var BnetUrlBuilder = {
     'hostName': process.env.BnetHost,
@@ -28,6 +31,10 @@ function deleteMessage(message){
     message.delete({timeout : 3000})
         .then(console.log(`${new Date().toLocaleString()} --- ${message} successfully deleted`))
         .catch(console.error)
+}
+
+async function collectMappedRealms(){
+    return await GenerateRealms(BnetUrlBuilder);
 }
 
   /*
@@ -50,9 +57,22 @@ function deleteMessage(message){
         help                                    <- display all the commands                                          (built in)         -- completed
     */
 
-client.on('ready', () => {
-    console.log(`${client.user.username} has logged in...`)
+client.setInterval(() => {
+    console.log(`${new Date().toLocaleString()} --- running every ${minutes} minute.`);
+}, minutes * 60 * 1000);
+
+client.on('ready', async () => {
+    console.log(`${new Date().toLocaleString()} --- ${client.user.username} has logged in...`)
+    // obtaining auth token for world of warcraft api
+    await Passport(process.env.BnetID, process.env.BnetSecret)
+    .then((response) => {
+        token = response.access_token;
+        console.log(`${new Date().toLocaleString()} --- World of Warcraft API token configured...`)
+    });
     BnetUrlBuilder['token'] = token;
+    // mapping realms to connected realms id.
+    mappedRealms = await collectMappedRealms();
+    console.log(`${new Date().toLocaleString()} --- Realms have been mapped to connected realm ID`)
 });
 
 client.on('message', async (message) => {
@@ -179,18 +199,11 @@ client.on('message', async (message) => {
             else message.channel.send("```" +botResponses + "```");
         }
         if(botResponses === ResponseType.ERR.RESPONSE){
-            console.error(`ERROR: ${new Date().toLocaleString()} --- ${message.author.username} requested: ${message.content.trim().substring(PREFIX.length)}`)
+            console.log(`ERROR: ${new Date().toLocaleString()} --- ${message.author.username} requested: ${message.content.trim().substring(PREFIX.length)}`)
             setTimeout(() => message.channel.bulkDelete(2), 1000);
         }
     }
 })
 
 
-Passport(process.env.BnetID, process.env.BnetSecret)
-    .then((response) => {
-        token = response.access_token;
-        console.log("World of Warcraft API token configured...")
-    });
-
 client.login(_discordToken);
-console.log(process.argv);
