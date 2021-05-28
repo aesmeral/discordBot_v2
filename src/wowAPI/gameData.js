@@ -32,5 +32,15 @@ async function generateRealms(urlBuilder){
     return returnData;
 }
 
+async function tokenPrice(urlBuilder){
+    let hostname = urlBuilder.hostName;
+    let namespace = urlBuilder.gameDataNamespace.replace('static','dynamic'); // need to change from static to dynamic namespace
+    let requestURL = `${hostname}/data/wow/token/index${namespace}S&access_token=${urlBuilder.token}`;
+    return await RequestGet(requestURL)
+        .then((response) => {return response})
+        .catch((err) => {return err.response});
+}
+
 exports.GetItem = getItem;
 exports.GenerateRealms = generateRealms;
+exports.GetTokenPrice = tokenPrice;

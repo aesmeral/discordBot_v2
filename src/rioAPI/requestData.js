@@ -15,7 +15,6 @@ async function getCurrentAffix(urlBuilder){
     let hostName = urlBuilder.hostName;
     let namespace = urlBuilder.namespace;
     let requestURL = `${hostName}api/v1/mythic-plus/affixes?${namespace}&locale=en`
-
     return await RequestGet(requestURL)
         .then((response) => {return response})
         .catch((err) => {return err.response})

@@ -6,7 +6,7 @@ const { ResponseType } = require('./util/cmdType');
 const { GetRaider, GetAffix } = require('./rioAPI/requestData');
 const { FetchItems } = require('./built-in/fetchItems');
 const { RequestedItems } = require('./built-in/getItem');
-const { GenerateRealms } = require('./wowAPI/gameData');
+const { GenerateRealms, GetTokenPrice } = require('./wowAPI/gameData');
 
 const client = new Client();
 const PREFIX = "!"
@@ -52,6 +52,7 @@ async function collectMappedRealms(){
 
         itemPrice {server} {string/id}          <- gets auction house price from your server                         (built in)
         item  {item string}                     <- provides a link (multiple if applicable) to your item             (Blizzard API)     -- completed
+        token                                   <- provides current wow token price                                  (Blizzard API)     -- completed
         class {spec} {class}                    <- get a specific wowhead guide                                      (built-in)         
         class {class/spec}                      <- if given a class, provide multiple spec. if given a spec ^^       (built-in)
         help                                    <- display all the commands                                          (built in)         -- completed
@@ -116,9 +117,13 @@ client.on('message', async (message) => {
                 }
                 break;
             case 'affix':
-                response = await GetAffix(RaiderIOUrlBuilder)
-                let affixes = response.data.affix_details;
-                botResponses = ResponseType.AFFIX.RESPONSE(affixes);
+                response = await GetAffix(RaiderIOUrlBuilder);
+                console.log(response);
+                if(response.status < 400){
+                    let affixes = response.data.affix_details;
+                    botResponses = ResponseType.AFFIX.RESPONSE(affixes);
+                }
+                else botResponses = ResponseType.ERR.RESPONSE;
                 break;
             case 'arena':
                 if(args.length !== 3) botResponses = ResponseType.ERR.RESPONSE;
@@ -170,7 +175,7 @@ client.on('message', async (message) => {
                 else {
                     deleteMessage(message);
                     let rollValue = Math.floor(Math.random() * args[0]) + 1;
-                    botResponses = (ResponseType.ROLL.RESPONSE(message.author.username, rollValue, args[0]));
+                    botResponses = ResponseType.ROLL.RESPONSE(message.author.username, rollValue, args[0]);
                 }
                 break;
             case 'item':
@@ -184,8 +189,20 @@ client.on('message', async (message) => {
                     }
                 }
                 break;
+            case 'token':
+                response = await GetTokenPrice(BnetUrlBuilder);
+                if(response.status < 400){
+                    let price = parseInt(response.data.price);
+                    let lastUpdated =  parseInt(response.data.last_updated_timestamp);
+                    botResponses = ResponseType.TOKEN.RESPONSE(price,lastUpdated);
+                }
+                else {
+                    botResponses = ResponseType.ERR.RESPONSE;
+                }
+                break;
             default:
                 botResponses = ResponseType.ERR.RESPONSE;
+                break;
         }
         try {
             if (botResponses.fields.length > 0) message.channel.send(botResponses);

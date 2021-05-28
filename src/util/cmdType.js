@@ -2,6 +2,16 @@
 // minimize as much coding as possible.
 // the main point of this file and enum is to produce responses that the robot will respond with.
 
+function priceConverter(rawValue){
+    let currency = [0,0,0];
+    currency[0] = rawValue % 100;
+    rawValue = (rawValue - currency[0]) / 100;
+    currency[1] = rawValue % 100;
+    currency[2] = (rawValue - currency[1]) / 100
+    return `${currency[2]}g ${currency[1]}s ${currency[0]}c`;
+}
+
+
 const responseType = Object.freeze({
     ERR: {
         ID: -1,
@@ -93,6 +103,12 @@ const responseType = Object.freeze({
     ROLL: {
         ID: 8,
         RESPONSE: (author, value, maxValue) => {return `${author} rolls a ${value} (1-${maxValue}).`}
+    },
+    TOKEN: {
+        ID: 9,
+        RESPONSE: (price, lastUpdated) => {
+            return `Price: ${priceConverter(price)} Last Updated: ${new Date(lastUpdated).toLocaleString()}`
+        }
     },
 })
 
