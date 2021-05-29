@@ -25,9 +25,10 @@ const responseType = Object.freeze({
                   "4.char {server} {character}: Provides information of the character such as ilvl, class, race, gender.\n" +
                   "5.arena {bracket} {server} {character}: Provides information on the characters arena rating, weekly, and season statistics in the specific bracket.\n" + 
                   "6.item {item name}: Provides the best matches to requested item name and output's wowhead link for more information.\n" +
-                  "7.itemprice {server} {item name}: Provides the price of the item requested on a specific server. (NOT IMPLEMENTED YET)\n" +
-                  "8.class {spec} {class}: provides a wowhead guide for your class and spec\n" +
-                  "9.roll {number}: Roll from 1 to n.\n\n" +
+                  "7.itemprice {server} {item name}: Provides the price of the item requested on a specific server. (IMPLEMENTATION IN PROGRESS)\n" +
+                  "8.class {spec} {class}: provides a wowhead guide for your class and spec (NOT IMPLEMENTED YET)\n" +
+                  "9.roll {number}: Roll from 1 to n.\n" +
+                  "10.token: Provides live cost of a WoW token\n\n" + 
                   "Example Request: !io tichondrius qaintwo" 
     },   
     IO: {
