@@ -6,6 +6,7 @@ const { ResponseType } = require('./util/cmdType');
 const { GetRaider, GetAffix } = require('./rioAPI/requestData');
 const { RequestedItems } = require('./built-in/getItem');
 const { GenerateRealms, GetTokenPrice, GenerateAuction } = require('./wowAPI/gameData');
+const { GetItemPrice } = require('./built-in/getAuctionHousePrice');
 
 const client = new Client();
 const PREFIX = "!"
@@ -41,7 +42,8 @@ async function collectMappedRealms(){
 }
 
 async function collectedAuctionData(connectedID){
-    return await GenerateAuction(BnetUrlBuilder, connectedID);
+    console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data for connected realm ${connectedID}.`);
+    auctionHouseData[connectedID] = await GenerateAuction(BnetUrlBuilder, connectedID);
 }
 
     // Implementation for classes ... { class: [spec] , ... } AND { spec: class, ... } <- assuming all spec is unique.
@@ -56,7 +58,7 @@ async function collectedAuctionData(connectedID){
         arena {bracket} {server} {character}    <- gets arena rating details                                         (Blizzard API)     -- completed
         roll {number}                           <- roll from 1 - {number}. if we're pugging this is helpful          (built in)         -- completed    
 
-        itemPrice {server} {string}             <- gets auction house price from your server                         (built in)         -- IN PROGRESS
+        itemPrice {server} {string}             <- gets auction house price from your server                         (built in)         -- completed
         item  {item string}                     <- provides a link (multiple if applicable) to your item             (Blizzard API)     -- completed
         token                                   <- provides current wow token price                                  (Blizzard API)     -- completed
         class {spec} {class}                    <- get a specific wowhead guide                                      (built-in)          
@@ -64,8 +66,11 @@ async function collectedAuctionData(connectedID){
         help                                    <- display all the commands                                          (built in)         -- completed
     */
 
-client.setInterval(() => {
-    console.log(`${new Date().toLocaleString()} --- running every ${minutes} minute.`);
+client.setInterval( async () => {
+    console.log(`${new Date().toLocaleString()} --- Hourly Auction House Data update.`);
+    let actions = Array.from(connectedRealmsID).map(collectedAuctionData);
+    Promise.all(actions)
+    console.log(`${new Date().toLocaleString()} --- Hourly Auction House Data update complete.`);
 }, minutes * 60 * 1000);
 
 client.on('ready', async () => {
@@ -80,14 +85,12 @@ client.on('ready', async () => {
     let realms = await collectMappedRealms();
     mappedRealms = realms.returnData;
     connectedRealmsID = realms.uniqueID;
+
     console.log(`${new Date().toLocaleString()} --- Realms have been mapped to connected realm ID`)
     console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data between all connected realms`);
-    let counter = 1;
-    for (let r_id of connectedRealmsID) {
-        auctionHouseData[r_id] = await collectedAuctionData((r_id));
-        console.log(`${new Date().toLocaleString()} --- Allocated Auction House Data for connected realm ${r_id}. ${counter} of ${connectedRealmsID.size} processed `);
-        counter++;
-    }
+    let actions = Array.from(connectedRealmsID).map(collectedAuctionData);
+    Promise.all(actions)
+    console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data between all connected realms requested/complete/in-progress.`);
 });
 
 client.on('message', async (message) => {
@@ -205,12 +208,15 @@ client.on('message', async (message) => {
                     break;
                 case 'itemprice':
                     // args[0] = server, args[1] = item
-                    if(args.length != 2) botResponses = ResponseType.ERR.RESPONSE;
+                    if(args.length < 2) botResponses = ResponseType.ERR.RESPONSE;
                     else {
-                        let data = await RequestedItems(args[1], BnetUrlBuilder);
+                        let data = await RequestedItems(args.slice(1), BnetUrlBuilder);
                         if(data.length > 0){
                             let item = data[0];
-                            // {price, quantity} = RequestedItemPrice(args[0], item, BnetUrlBuilder); <-- no need to do await because the auction house prices are cached. 
+                            let realmID = mappedRealms[args[0]];
+                            let itemPrice = GetItemPrice(auctionHouseData[realmID], item);
+                            if(itemPrice === undefined) botResponses = ResponseType.ITEMPRICE.SPECIALRESPONSE(item);
+                            else botResponses = ResponseType.ITEMPRICE.RESPONSE(item, args[0], itemPrice);
                         } else {
                             botResponses = "```No item could be found```";
                         }

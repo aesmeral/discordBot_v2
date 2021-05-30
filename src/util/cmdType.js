@@ -99,7 +99,12 @@ const responseType = Object.freeze({
     },
     ITEMPRICE: {
         ID: 7,
-        RESPONSE: "PLACEHOLDER"
+        RESPONSE: (item, server, price) => {
+            return `${item.name} on ${server} lowest BUYOUT/BID price is: ${priceConverter(price)}`;
+        },
+        SPECIALRESPONSE: (item) => {
+            return `Auction House Data is currently being updated or inititated for your realm, please try again in a seconds or item is not tradable.`
+        }
     },
     ROLL: {
         ID: 8,
