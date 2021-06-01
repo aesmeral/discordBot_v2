@@ -25,11 +25,11 @@ const responseType = Object.freeze({
                   "4.char {server} {character}: Provides information of the character such as ilvl, class, race, gender.\n" +
                   "5.arena {bracket} {server} {character}: Provides information on the characters arena rating, weekly, and season statistics in the specific bracket.\n" + 
                   "6.item {item name}: Provides the best matches to requested item name and output's wowhead link for more information.\n" +
-                  "7.itemprice {server} {item name}: Provides the price of the item requested on a specific server. (IMPLEMENTATION IN PROGRESS)\n" +
+                  "7.itemprice {server} {item name}: Provides the price of the item requested on a specific server.\n" +
                   "8.class {spec} {class}: provides a wowhead guide for your class and spec (NOT IMPLEMENTED YET)\n" +
                   "9.roll {number}: Roll from 1 to n.\n" +
                   "10.token: Provides live cost of a WoW token\n\n" + 
-                  "Example Request: !io tichondrius qaintwo" 
+                  "Example Request: /io tichondrius qaintwo" 
     },   
     IO: {
         ID: 1,
@@ -100,7 +100,7 @@ const responseType = Object.freeze({
     ITEMPRICE: {
         ID: 7,
         RESPONSE: (item, server, price) => {
-            return `${item.name} on ${server} lowest BUYOUT/BID price is: ${priceConverter(price)}`;
+            return `${item.name} on ${server}: ${priceConverter(price)}`;
         },
         SPECIALRESPONSE: (item) => {
             return `Auction House Data is currently being updated or inititated for your realm, please try again in a seconds or item is not tradable.`

@@ -9,7 +9,7 @@ const { GenerateRealms, GetTokenPrice, GenerateAuction } = require('./wowAPI/gam
 const { GetItemPrice } = require('./built-in/getAuctionHousePrice');
 
 const client = new Client();
-const PREFIX = "!"
+const PREFIX = "/"
 const _discordToken = process.env.DISCORD_TOKEN;
 const minutes = parseInt(process.env.IntervalTime);
 
@@ -42,7 +42,7 @@ async function collectMappedRealms(){
 }
 
 async function collectedAuctionData(connectedID){
-    console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data for connected realm ${connectedID}.`);
+    // console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data for connected realm ${connectedID}.`);
     auctionHouseData[connectedID] = await GenerateAuction(BnetUrlBuilder, connectedID);
 }
 
@@ -105,6 +105,7 @@ client.on('message', async (message) => {
         console.log(`${new Date().toLocaleString()} --- ${message.author.username} requested: ${message.content.trim().substring(PREFIX.length)}`)
         let botResponses = `PlaceHolder`;
         let response; 
+        let noRequest = false
         try {            // catch any errors I miss from within the switch statement to ensure availability.
             switch(cmd.toLowerCase()){
                 case 'help':
@@ -234,7 +235,7 @@ client.on('message', async (message) => {
                     }
                     break;
                 default:
-                    botResponses = ResponseType.ERR.RESPONSE;
+                    noRequest = true;
                     break;
             }
             try {
@@ -246,7 +247,7 @@ client.on('message', async (message) => {
                         setTimeout(() => message.channel.bulkDelete(2), 1000);
                     }
                 }
-                else message.channel.send("```" +botResponses + "```");
+                else if(noRequest == false) message.channel.send("```" +botResponses + "```");
             }
         } catch { 
             botResponses = ResponseType.ERR.RESPONSE

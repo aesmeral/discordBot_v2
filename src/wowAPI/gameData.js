@@ -45,6 +45,13 @@ async function generateAuctionHouse(urlBuilder, connectedRealmID){
     if (response.status > 400) return null;
     else {
         let data = response.data.auctions;
+        if(data === undefined) {                                // for some reason the data for this gets cut off?  so we'll reprocess the response.              
+            console.log(`${new Date().toLocaleString()} --- re-sending request to ${requestURL} due to data issue.`)
+            response = await RequestGet(requestURL)
+                .then((response) => {return response})
+                .catch((err) => {return err.response})
+            data = response.data.auctions
+        }
         data.forEach(e => {
             if (returnData[e.item.id] === undefined) {
                 returnData[e.item.id] = e.buyout ? e.buyout : e.unit_price;
