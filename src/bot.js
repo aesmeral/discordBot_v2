@@ -1,5 +1,6 @@
 require('dotenv').config();
 const { Passport } = require('./wowAPI/setup')
+const pLimit = require("p-limit")
 const { Client, MessageEmbed } = require('discord.js');
 const { GetArena, GetCharacter, GetAvater } = require('./wowAPI/profiles');
 const { ResponseType } = require('./util/cmdType');
@@ -9,9 +10,11 @@ const { GenerateRealms, GetTokenPrice, GenerateAuction } = require('./wowAPI/gam
 const { GetItemPrice } = require('./built-in/getAuctionHousePrice');
 
 const client = new Client();
-const PREFIX = "/"
+const PREFIX = "!"
 const _discordToken = process.env.DISCORD_TOKEN;
 const minutes = parseInt(process.env.IntervalTime);
+// limit to 10 requests for auction house data to keep CPU and network traffic low. (instead of making 83 request at once)
+const limit = pLimit(10);
 
 
 var mappedRealms;               // cacheed 
@@ -42,7 +45,6 @@ async function collectMappedRealms(){
 }
 
 async function collectedAuctionData(connectedID){
-    // console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data for connected realm ${connectedID}.`);
     auctionHouseData[connectedID] = await GenerateAuction(BnetUrlBuilder, connectedID);
 }
 
@@ -64,11 +66,15 @@ async function collectedAuctionData(connectedID){
         class {spec} {class}                    <- get a specific wowhead guide                                      (built-in)          
         class {class/spec}                      <- if given a class, provide multiple spec. if given a spec ^^       (built-in)
         help                                    <- display all the commands                                          (built in)         -- completed
+
+        kanye                                   <- get a random quote from kanye (https://kanye.rest/)              (hidden-feature)    
     */
+
 
 client.setInterval( async () => {
     console.log(`${new Date().toLocaleString()} --- Hourly Auction House Data update.`);
-    let actions = Array.from(connectedRealmsID).map(collectedAuctionData);
+    let realmIDs = Array.from(connectedRealmsID);
+    let actions = realmIDs.map(id => { return limit(() => collectedAuctionData(id))});
     Promise.all(actions)
     console.log(`${new Date().toLocaleString()} --- Hourly Auction House Data update complete.`);
 }, minutes * 60 * 1000);
@@ -88,9 +94,11 @@ client.on('ready', async () => {
 
     console.log(`${new Date().toLocaleString()} --- Realms have been mapped to connected realm ID`)
     console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data between all connected realms`);
-    let actions = Array.from(connectedRealmsID).map(collectedAuctionData);
+    // let actions = Array.from(connectedRealmsID).map(collectedAuctionData);
+    // Promise.all(actions)
+    let realmIDs = Array.from(connectedRealmsID);
+    let actions = realmIDs.map(id => { return limit(() => collectedAuctionData(id))});
     Promise.all(actions)
-    console.log(`${new Date().toLocaleString()} --- Allocating Auction House Data between all connected realms requested/complete/in-progress.`);
 });
 
 client.on('message', async (message) => {
@@ -102,6 +110,7 @@ client.on('message', async (message) => {
         .split(" ");
 
         // commands start here 
+        // TODO Refactor this code
         console.log(`${new Date().toLocaleString()} --- ${message.author.username} requested: ${message.content.trim().substring(PREFIX.length)}`)
         let botResponses = `PlaceHolder`;
         let response; 
@@ -233,6 +242,10 @@ client.on('message', async (message) => {
                     else {
                         botResponses = ResponseType.ERR.RESPONSE;
                     }
+                    break;
+                case 'realmcheck':
+                    let realmID = mappedRealms[args[0]];
+                    console.log(auctionHouseData[realmID]);
                     break;
                 default:
                     noRequest = true;

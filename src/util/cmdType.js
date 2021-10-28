@@ -29,7 +29,7 @@ const responseType = Object.freeze({
                   "8.class {spec} {class}: provides a wowhead guide for your class and spec (NOT IMPLEMENTED YET)\n" +
                   "9.roll {number}: Roll from 1 to n.\n" +
                   "10.token: Provides live cost of a WoW token\n\n" + 
-                  "Example Request: /io tichondrius qaintwo" 
+                  "Example Request: !io tichondrius qaintwo" 
     },   
     IO: {
         ID: 1,
