@@ -273,5 +273,5 @@ client.on('message', async (message) => {
     }
 })
 
-
+console.log("testing -- main")
 client.login(_discordToken);
