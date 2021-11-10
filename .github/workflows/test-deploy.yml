@@ -8,4 +8,4 @@ jobs:
     steps:
     - name: executing remote ssh commands using password
       uses: actions/checkout@v2
-       run: ssh -i ${{secrets.PKEY}} anthony@192.168.1.31 && ll -t
+      run: ssh -i ${{secrets.PKEY}} anthony@192.168.1.31 && ll -t
