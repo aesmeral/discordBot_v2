@@ -9,7 +9,7 @@ jobs:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
       with:
-        host: raspi
+        host: 192.168.1.31
         username: anthony
         password: ${{ secrets.PWORD }}
         port: 22
