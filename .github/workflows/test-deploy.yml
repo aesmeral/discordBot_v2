@@ -10,4 +10,4 @@ jobs:
     
       # testing
     - name: executing remote ssh commands using password
-      run: ssh anthony@192.168.1.31
+      run: whoami
