@@ -6,6 +6,7 @@ jobs:
     name: Build
     runs-on: self-hosted
     steps:
+    - uses: actions/checkout@v2
+
     - name: executing remote ssh commands using password
-      uses: actions/checkout@v2
       run: ssh -i ${{secrets.PKEY}} anthony@192.168.1.31 && ll -t
