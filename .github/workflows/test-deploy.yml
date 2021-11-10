@@ -14,4 +14,8 @@ jobs:
         cd /home/anthony/projects/discordBot
         git pull
         cd /home/anthony/scripts
-        ./restartDiscordBot
+    
+    - name: restarting discordBot
+      run: |
+        cd /home/anthony/scripts
+        ./restartDiscordbot
