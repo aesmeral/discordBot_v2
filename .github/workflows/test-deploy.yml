@@ -11,7 +11,7 @@ jobs:
       # testing
     - name: executing remote ssh commands using password
       run: |
-      cd /home/anthony/projects/discordBot
-      git pull
-      cd /home/anthony/scripts
-      ./restartDiscordBot
+        cd /home/anthony/projects/discordBot
+        git pull
+        cd /home/anthony/scripts
+        ./restartDiscordBot
