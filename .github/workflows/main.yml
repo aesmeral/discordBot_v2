@@ -35,4 +35,4 @@ jobs:
           echo Add other actions to build,
           echo test, and deploy your project.
       - name: test-workflow
-        run: sudo -iu anthony && mkdir /home/anthony/diditwork?
+        run: sudo -iu root && ll -t /home/
