@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: main
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -name: testing-ssh
+      uses: appleboy/ssh-action@master
+      with:
+        host: 192.168.1.31
+        username: anthony
+        key: ${{secrets.P_KEY}}
+        port: 22
+        run: ll -t
