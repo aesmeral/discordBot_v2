@@ -7,7 +7,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@master
+      uses: actions/checkout@v2
       with:
         host: 192.168.1.31
         username: anthony
