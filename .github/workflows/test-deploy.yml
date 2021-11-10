@@ -11,6 +11,6 @@ jobs:
       with:
         host: raspi
         username: anthony
-        key: ${{ secrets.PWORD }}
+        password: ${{ secrets.PWORD }}
         port: 22
         run: ll -t
