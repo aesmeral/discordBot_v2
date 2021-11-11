@@ -3,6 +3,7 @@ on:
   workflow_dispatch
 
 jobs:
+
   build:
     name: Build
     runs-on: self-hosted
@@ -10,6 +11,6 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: restart discordbot
-      run: |
-        cd /home/anthony/scripts
-        ./restartDiscordbot
+        run: |
+          cd /home/anthony/scripts
+          ./restartDiscordbot
