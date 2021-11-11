@@ -9,7 +9,7 @@ jobs:
     - uses: actions/checkout@v2
     
       # testing
-    - name: executing remote ssh commands using password
+    - name: update discordbot prod src code
       run: |
         cd /home/anthony/projects/discordBot
         git pull
